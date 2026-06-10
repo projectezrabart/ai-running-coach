@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>260525 – 22m – Long Run</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;height:100dvh;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;background:#0d1117;color:#fff;}
+body{display:flex;align-items:center;justify-content:center;transition:background-color .55s ease,color .55s ease;}
+body.s-hard{background:#c0392b;color:#fff}
+body.s-easy{background:#1b7a3e;color:#fff}
+.screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:430px;height:100%;}
+.screen.active{display:flex}
+#startScreen{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:max(36px,env(safe-area-inset-top,36px)) 22px max(28px,env(safe-area-inset-bottom,28px));gap:0;align-items:stretch;}
+.hdr{text-align:center;margin-bottom:16px}
+.hdr-title{font-size:1.9rem;font-weight:800;letter-spacing:-.5px}
+.hdr-meta{font-size:.78rem;opacity:.38;margin-top:3px;letter-spacing:.3px}
+.legend{display:flex;gap:16px;justify-content:center;margin-bottom:14px;}
+.leg-item{display:flex;align-items:center;gap:7px;font-size:.82rem;opacity:.7}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.leg-dot.run{background:#c0392b}.leg-dot.walk{background:#1b7a3e}
+.timeline{display:flex;gap:2px;width:100%;height:12px;border-radius:6px;overflow:hidden;margin-bottom:20px;flex-shrink:0;}
+.tl-seg{height:100%;border-radius:3px;flex-shrink:0;min-width:3px}
+.tl-seg.hard{background:#c0392b}.tl-seg.easy{background:#1b7a3e}
+.briefing{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.pc{background:rgba(255,255,255,.055);border-radius:13px;padding:13px 15px;}
+.pc-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;}
+.pc-name{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1.3px}
+.pc-dur{font-size:.72rem;font-weight:600;opacity:.38}
+.pc-body{font-size:.85rem;line-height:1.45;opacity:.58}
+.iv-rows{display:flex;flex-direction:column;gap:6px;margin-top:9px}
+.iv-row{display:flex;align-items:center;gap:9px;font-size:.82rem;opacity:.62}
+.iv-pip{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.iv-pip.hard{background:#c0392b}.iv-pip.easy{background:#1b7a3e}
+.iv-t{font-weight:700;opacity:1;min-width:36px;font-size:.8rem}
+.cta{margin-top:4px}
+.start-btn{display:block;width:100%;background:#fff;color:#0d1117;border:none;border-radius:14px;padding:18px;font-size:1.2rem;font-weight:700;cursor:pointer;-webkit-appearance:none;letter-spacing:.3px;box-shadow:0 6px 28px rgba(0,0,0,.4);}
+.start-btn:active{transform:scale(.98);opacity:.92}
+.s-note{font-size:.68rem;opacity:.25;text-align:center;margin-top:10px;padding:0 16px;}
+#runScreen{justify-content:space-between;padding:max(24px,env(safe-area-inset-top,24px)) 28px max(20px,env(safe-area-inset-bottom,20px));}
+.run-top{width:100%;display:flex;flex-direction:column;align-items:center;gap:9px}
+.run-phase{font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.5;}
+.run-time{font-size:.7rem;font-weight:600;opacity:.38;letter-spacing:1.5px;text-transform:uppercase;}
+.dots-wrap{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:340px;}
+.dot{width:6px;height:6px;border-radius:50%;transition:transform .3s,opacity .3s;}
+.dot.type-hard{background:#c0392b}.dot.type-easy{background:#1b7a3e}
+.dot.d-done{opacity:.35}.dot.d-future{opacity:.18}.dot.d-current{opacity:1;transform:scale(1.8);box-shadow:0 0 0 2px rgba(255,255,255,.55)}
+.run-mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:10px 0;}
+.iv-name{font-size:3rem;font-weight:800;text-transform:uppercase;letter-spacing:-.5px;line-height:1;}
+.iv-desc{font-size:.9rem;font-weight:500;opacity:.58;min-height:1.4em}
+#timerDisplay{font-size:7.8rem;font-weight:200;letter-spacing:-5px;font-variant-numeric:tabular-nums;line-height:1;margin:8px 0;}
+.iv-bar{width:200px;height:3px;border-radius:2px;overflow:hidden;background:rgba(255,255,255,.18);}
+.iv-fill{height:100%;border-radius:2px;background:rgba(255,255,255,.8);transition:width .9s linear;}
+.quote-box{opacity:0;transition:opacity .9s ease;text-align:center;padding:10px 8px;max-width:320px;margin:4px 0;}
+.quote-box.show{opacity:1}
+.quote-txt{font-size:.78rem;font-style:italic;line-height:1.5;opacity:.72}
+.quote-auth{font-size:.68rem;opacity:.45;margin-top:5px;font-weight:600;letter-spacing:.3px}
+.run-bot{text-align:center;width:100%}
+.next-lbl{font-size:.65rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;opacity:.38;margin-bottom:4px;}
+.next-val{font-size:1.5rem;font-weight:700;opacity:.72}
+.vol-row{display:flex;align-items:center;gap:10px;width:100%;padding:0 4px;margin-top:12px;}
+.vol-ico{font-size:.9rem;opacity:.45;flex-shrink:0}
+input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:3px;border-radius:2px;outline:none;cursor:pointer;background:rgba(255,255,255,.22);}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.9);cursor:pointer;}
+#doneScreen{justify-content:center;text-align:center;gap:14px;padding:28px;}
+.done-title{font-size:3rem;font-weight:800;letter-spacing:-1px}
+.done-sub{font-size:1rem;opacity:.5}
+.done-stats{font-size:.78rem;opacity:.3;letter-spacing:.5px;margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="screen active" id="startScreen">
+  <div class="hdr">
+    <div class="hdr-title">260525 – 22m – Long Run</div>
+    <div class="hdr-meta">4 run segments · 3 walk breaks · four run segments</div>
+  </div>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot run"></div>Run</div>
+    <div class="leg-item"><div class="leg-dot walk"></div>Walk</div>
+  </div>
+  <div class="timeline" id="timeline"></div>
+  <div class="briefing">
+    <div class="pc" style="border-left:3px solid #c0392b">
+      <div class="pc-top"><div class="pc-name">Opening</div><div class="pc-dur">7:15</div></div>
+      <div class="pc-body">6-minute opener, 75-second walk to reset.</div>
+      <div class="iv-rows">
+        <div class="iv-row"><div class="iv-pip hard"></div><div class="iv-t">6:00</div><div>6-minute opener</div></div>
+        <div class="iv-row"><div class="iv-pip easy"></div><div class="iv-t">1:15</div><div>1:15 walk break</div></div>
+      </div>
+    </div>
+    <div class="pc" style="border-left:3px solid #c0392b">
+      <div class="pc-top"><div class="pc-name">Middle</div><div class="pc-dur">12:00</div></div>
+      <div class="pc-body">Two 5-minute runs with 1-minute walks between them.</div>
+    </div>
+    <div class="pc" style="border-left:3px solid #c0392b">
+      <div class="pc-top"><div class="pc-name">Close Out</div><div class="pc-dur">2:45</div></div>
+      <div class="pc-body">Final 2:45 to finish. Push to the end.</div>
+    </div>
+  </div>
+  <div class="cta">
+    <button class="start-btn" onclick="startRun()">Let's Go</button>
+    <div class="s-note">Bell + voice only — Spotify keeps playing</div>
+  </div>
+</div>
+
+<div class="screen" id="runScreen">
+  <div class="run-top">
+    <div class="run-phase" id="runPhase">OPENING</div>
+    <div class="run-time" id="runTime">0:00 / 22:00</div>
+    <div class="dots-wrap" id="dotsWrap"></div>
+  </div>
+  <div class="run-mid">
+    <div class="iv-name" id="ivName">RUN</div>
+    <div class="iv-desc" id="ivDesc">6-minute opener</div>
+    <div id="timerDisplay">6:00</div>
+    <div class="iv-bar"><div class="iv-fill" id="ivFill" style="width:100%"></div></div>
+    <div class="quote-box" id="quoteBox">
+      <div class="quote-txt" id="quoteText"></div>
+      <div class="quote-auth" id="quoteAuth"></div>
+    </div>
+  </div>
+  <div class="run-bot">
+    <div class="next-lbl">Next up</div>
+    <div class="next-val" id="nextVal">Walk · 1:15</div>
+    <div class="vol-row">
+      <span class="vol-ico">&#128276;</span>
+      <input type="range" id="volSlider" min="0" max="100" value="80" oninput="setVol(this.value)">
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="doneScreen">
+  <div class="done-title">Run done! &#127937;</div>
+  <div class="done-sub">22:00 on the clock. Great work.</div>
+  <div class="done-stats">4 run segments · 22:00 total</div>
+</div>
+
+<script>
+const IVS=[
+  ['hard',360,'Run',"6-minute opener",'Opening'],
+  ['easy',75,'Walk',"1:15 walk break",'Opening'],
+  ['hard',300,'Run',"5-minute run",'Middle'],
+  ['easy',60,'Walk',"1-minute walk break",'Middle'],
+  ['hard',300,'Run',"5-minute push",'Middle'],
+  ['easy',60,'Walk',"1-minute walk break",'Middle'],
+  ['hard',165,'Run',"Final 2:45 — close it out",'Close Out']
+];
+(function(){const tl=document.getElementById('timeline');IVS.forEach(iv=>{const s=document.createElement('div');s.className='tl-seg '+iv[0];s.style.flexBasis=(iv[1]/1320*100)+'%';tl.appendChild(s);});})();
+const QUOTES=[
+  ["The miracle isn't that I finished. The miracle is that I had the courage to start.","John Bingham"],
+  ["Most people run a race to see who is fastest. I run a race to see who has the most guts.","Steve Prefontaine"],
+  ["Some days it just hurts. But that doesn't mean it's not worth it.","Des Linden — 2018 Boston Marathon winner"],
+  ["Running is the greatest metaphor for life, because you get out of it what you put into it.","Oprah Winfrey"],
+  ["The real purpose of running isn't to win a race. It's to test the limits of the human heart.","Kathrine Switzer — first woman to officially run the Boston Marathon"],
+  ["Every day I make the choice to show up and see what I've got, and to try and be better.","Shalane Flanagan — 2017 NYC Marathon winner"],
+  ["No one can say, 'You must not run faster than this, or jump higher than that.' The human spirit is indomitable.","Roger Bannister — first sub-4 minute miler"],
+  ["You cannot propel yourself forward by patting yourself on the back.","Steve Prefontaine"],
+  ["As every runner knows, running is about more than just putting one foot in front of the other; it is about our lifestyle and who we are.","Joan Benoit Samuelson — 1984 Olympic marathon champion"],
+  ["We are all runners, some just run faster than others. I never met a fake runner.","Bart Yasso"],
+  ["When anyone tells me I can't do anything, I'm just not listening any more.","Florence Griffith Joyner — 3x Olympic gold medalist"],
+  ["It's okay to be a mess sometimes. What matters is showing up anyway.","Molly Seidel — Olympic bronze medalist"],
+  ["To be a consistent winner means preparing not just one day, one month, or even one year, but for a lifetime.","Bill Rogers — 4x Boston Marathon winner"],
+  ["I don't think about the miles that are coming down the road. I think about what I'm doing right now, just being lost in the moment.","Ryan Hall — U.S. Olympic marathoner"],
+  ["When you have the enthusiasm and the passion, you end up figuring how to excel.","Deena Kastor — Olympic silver medalist"],
+  ["For every finish-line tape a runner breaks, there are the hours of hard and often lonely work that rarely gets talked about.","Grete Waitz — 9x NYC Marathon winner"],
+  ["I always loved running — it was something you could do by yourself, and under your own power.","Jesse Owens — 4x Olympic gold medalist"],
+  ["If you believe in your dreams and never ever give up, things will turn out for the best.","Meb Keflezighi — NYC Marathon & Boston Marathon champion"],
+  ["The ultimate is not to win, but to reach within the depths of your capabilities and to compete against yourself.","Billy Mills — 1964 Olympic gold medalist"],
+  ["Run when you can, walk if you have to, crawl if you must; just never give up.","Dean Karnazes — ultramarathon runner"],
+  ["You can't become a winner overnight. All the time you have to keep believing that one day you will win.","Paula Radcliffe — former women's marathon world record holder"],
+  ["Running has always been a relief and a sanctuary — something that makes me feel good, both physically and mentally.","Kara Goucher — U.S. Olympic marathoner"],
+  ["Pain is temporary. If I quit, however, it lasts forever.","Lance Armstrong"],
+  ["Ask yourself: 'Can I give more?' The answer is usually: 'Yes.'","Paul Tergat — 5x World Cross Country champion"],
+  ["We runners are all a little nutty, but we're good people who just want to enjoy our healthy, primitive challenge.","John J. Kelley — 2x Boston Marathon winner, U.S. Olympian"]
+];
+let actx=null,idx=0,tLeft=0,elapsed=0,ticker=null,wl=null,bellVol=0.8;
+const TOTAL=1320;
+function setVol(v){bellVol=v/100;}
+async function audio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();if(actx.state!=='running')await actx.resume();return actx;}
+async function bell(){try{const c=await audio(),t=c.currentTime,v=bellVol;const sk=c.createOscillator(),sg=c.createGain();sk.type='sawtooth';sk.frequency.setValueAtTime(700,t);sk.frequency.exponentialRampToValueAtTime(140,t+.065);sg.gain.setValueAtTime(.45*v,t);sg.gain.exponentialRampToValueAtTime(.001,t+.065);sk.connect(sg);sg.connect(c.destination);sk.start(t);sk.stop(t+.065);[{f:840,g:.38,d:2.6},{f:1190,g:.20,d:2.0},{f:1680,g:.11,d:1.4},{f:2310,g:.06,d:.9},{f:2318,g:.05,d:.7}].forEach(p=>{const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.setValueAtTime(p.f,t);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(p.g*v,t+.004);g.gain.exponentialRampToValueAtTime(.0001,t+p.d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+p.d);});}catch(e){}}
+function say(txt){if(!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.rate=1.15;u.pitch=1.0;u.volume=bellVol;const vs=speechSynthesis.getVoices();const v=vs.find(x=>x.name==='Samantha')||vs.find(x=>x.lang==='en-AU')||vs.find(x=>x.lang==='en-US'&&!x.name.includes('Google'))||vs.find(x=>x.lang.startsWith('en'));if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){}}
+const fmt=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+function drawDots(){const w=document.getElementById('dotsWrap');w.innerHTML='';IVS.forEach((iv,i)=>{const d=document.createElement('div');d.className='dot type-'+iv[0]+' '+(i<idx?'d-done':i===idx?'d-current':'d-future');w.appendChild(d);});}
+let lastPhase='';
+function render(){const iv=IVS[idx],nx=IVS[idx+1];document.body.className='s-'+iv[0];document.getElementById('ivName').textContent=iv[2].toUpperCase();document.getElementById('ivDesc').textContent=iv[3];document.getElementById('timerDisplay').textContent=fmt(tLeft);document.getElementById('ivFill').style.width=(tLeft/iv[1]*100)+'%';document.getElementById('runTime').textContent=fmt(elapsed)+' / '+fmt(TOTAL);document.getElementById('nextVal').textContent=nx?nx[2]+' · '+fmt(nx[1]):'—';if(iv[4]!==lastPhase){lastPhase=iv[4];document.getElementById('runPhase').textContent=iv[4].toUpperCase();}drawDots();}
+function begin(i){const prev=IVS[idx][4];idx=i;tLeft=IVS[i][1];bell();setTimeout(()=>{const ph=IVS[i][4]!==prev&&i>0?IVS[i][4]+'. ':'';const nx=IVS[i+1];say(`${ph}${IVS[i][2]}. ${nx?'Next up: '+nx[2]+' for '+fmt(nx[1])+'.':'Final stretch \u2014 keep going.'}`);},700);render();const qb=document.getElementById('quoteBox');if(IVS[i][0]==='easy'){let wc=0;for(let j=0;j<i;j++)if(IVS[j][0]==='easy')wc++;const q=QUOTES[wc%QUOTES.length];document.getElementById('quoteText').textContent='\u201c'+q[0]+'\u201d';document.getElementById('quoteAuth').textContent='\u2014 '+q[1];setTimeout(()=>qb.classList.add('show'),300);}else{qb.classList.remove('show');}}
+function tick(){tLeft--;elapsed++;if(tLeft<=0){idx+1<IVS.length?begin(idx+1):finish();}else render();}
+function finish(){clearInterval(ticker);ticker=null;document.getElementById('runScreen').classList.remove('active');document.getElementById('doneScreen').classList.add('active');document.body.className='';bell();setTimeout(()=>say('Run complete. Well done.'),800);if(wl){wl.release();wl=null;}}
+async function startRun(){audio();speechSynthesis&&speechSynthesis.getVoices();try{if(navigator.wakeLock)wl=await navigator.wakeLock.request('screen');}catch(e){}document.getElementById('startScreen').classList.remove('active');document.getElementById('runScreen').classList.add('active');begin(0);ticker=setInterval(tick,1000);}
+document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'&&ticker){try{if(navigator.wakeLock)wl=await navigator.wakeLock.request('screen');}catch(e){}try{await audio();}catch(e){}}});
+</script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>AI Running Coach — Workout Library</title>
+<style>
+:root{
+  --blue:#011B50; --green:#B9C930; --gray:#D3D3D3; --ink:#222222; --white:#FFFFFF;
+  --gray-soft:#ECECEC; --gray-line:#D3D3D3;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI','Helvetica Neue',Arial,sans-serif;background:var(--white);color:var(--ink);line-height:1.5;}
+
+/* ---------- HEADER ---------- */
+.banner{background:var(--blue);color:#fff;padding:34px 24px 30px;}
+.banner-inner{max-width:1080px;margin:0 auto;}
+.brand-row{display:flex;align-items:center;gap:14px;}
+.logo-mark{width:46px;height:46px;border-radius:12px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-mark svg{width:28px;height:28px;display:block}
+.banner h1{font-size:1.85rem;font-weight:800;letter-spacing:-.5px;line-height:1.1;}
+.banner .sub{font-size:.92rem;opacity:.72;margin-top:3px;font-weight:500}
+.acid-rule{height:4px;width:64px;background:var(--green);border-radius:3px;margin-top:18px;}
+
+/* ---------- LAYOUT ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 24px 60px;}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:34px 0 4px;}
+.section-head:first-child{margin-top:0}
+.section-head h2{color:var(--blue);font-size:1.18rem;font-weight:800;letter-spacing:-.2px;}
+.section-head .count{color:var(--ink);opacity:.5;font-size:.82rem;font-weight:600}
+.section-rule{height:3px;background:var(--green);border-radius:2px;width:100%;margin-bottom:20px;}
+
+/* ---------- STAT TILES ---------- */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:8px;}
+.stat{background:var(--gray-soft);border-radius:14px;padding:16px 18px;border-left:5px solid var(--green);}
+.stat .v{font-size:1.7rem;font-weight:800;color:var(--blue);letter-spacing:-.5px;line-height:1.05;}
+.stat .l{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;opacity:.55;margin-top:5px;}
+.stat .x{font-size:.74rem;opacity:.6;margin-top:2px}
+
+/* ---------- CONTROLS ---------- */
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:22px;}
+.search{flex:1 1 220px;position:relative;}
+.search input{width:100%;padding:11px 14px 11px 38px;border:2px solid var(--gray-line);border-radius:11px;font-size:.92rem;color:var(--ink);background:#fff;outline:none;font-family:inherit;}
+.search input:focus{border-color:var(--blue);}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:17px;height:17px;opacity:.4}
+.segbtns{display:flex;gap:0;border:2px solid var(--gray-line);border-radius:11px;overflow:hidden;}
+.segbtns button{border:none;background:#fff;color:var(--ink);padding:10px 15px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit;}
+.segbtns button.on{background:var(--blue);color:#fff;}
+.segbtns button:not(:last-child){border-right:2px solid var(--gray-line);}
+select.sort{padding:10px 13px;border:2px solid var(--gray-line);border-radius:11px;font-size:.85rem;font-weight:700;color:var(--ink);background:#fff;cursor:pointer;font-family:inherit;outline:none}
+select.sort:focus{border-color:var(--blue)}
+
+/* ---------- CARDS ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;}
+.card{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:#fff;border:1.5px solid var(--gray-line);border-radius:16px;padding:18px;transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease;position:relative;overflow:hidden;}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--green);}
+.card.long::before{background:var(--blue);}
+.card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(1,27,80,.14);border-color:var(--blue);}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;padding-left:6px;}
+.dur{font-size:1.9rem;font-weight:800;color:var(--blue);letter-spacing:-1px;line-height:1;}
+.dur span{font-size:.8rem;font-weight:700;opacity:.5;margin-left:1px}
+.tag{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;padding:5px 9px;border-radius:20px;white-space:nowrap;}
+.tag.pct{background:var(--green);color:var(--blue);}
+.tag.lr{background:var(--blue);color:#fff;}
+.card .meta{font-size:.82rem;opacity:.62;padding-left:6px;min-height:2.4em;}
+.card .tagline{font-size:.84rem;font-style:italic;opacity:.78;padding-left:6px;margin-top:9px;}
+
+/* intensity bar */
+.ibar{display:flex;height:8px;border-radius:5px;overflow:hidden;margin:14px 0 8px;margin-left:6px;background:var(--gray);}
+.ibar i{height:100%}
+.seg-easy{background:var(--gray);} .seg-hard{background:var(--green);} .seg-allout{background:var(--blue);}
+.long .seg-hard{background:var(--blue);} .long .seg-allout{background:var(--green);}
+.legend{display:flex;gap:14px;flex-wrap:wrap;padding-left:6px;font-size:.7rem;opacity:.6;margin-top:2px;}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
+
+.card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;padding-left:6px;border-top:1px solid var(--gray-soft);}
+.foot-stats{font-size:.74rem;font-weight:700;opacity:.55;}
+.open{font-size:.74rem;font-weight:800;color:var(--blue);display:flex;align-items:center;gap:4px;}
+.open svg{width:13px;height:13px}
+
+.empty{text-align:center;padding:50px 20px;opacity:.5;font-weight:600;display:none;}
+
+/* ---------- FOOTER ---------- */
+.foot{max-width:1080px;margin:0 auto;padding:0 24px;}
+.foot-bar{background:var(--blue);color:#fff;border-radius:14px;padding:16px 20px;font-size:.78rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.foot-bar .acc{color:var(--green);font-weight:800}
+
+@media (max-width:560px){
+  .banner h1{font-size:1.5rem}
+  .dur{font-size:1.7rem}
+}
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <div class="banner-inner">
+    <div class="brand-row">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#011B50" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M7 21l3-5 4 2 1 5"/><path d="M5 13l4-2 3 3 5-1"/><path d="M16 11l2 3"/></svg>
+      </div>
+      <div>
+        <h1>AI Running Coach</h1>
+        <div class="sub">Your interval &amp; long-run workout library</div>
+      </div>
+    </div>
+    <div class="acid-rule"></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="section-head"><h2>Overview</h2><span class="count">2026-05-24 – 2026-05-25</span></div>
+  <div class="section-rule"></div>
+  <div class="stats" id="stats"></div>
+
+  <div class="section-head"><h2>Workouts</h2><span class="count" id="shown"></span></div>
+  <div class="section-rule"></div>
+
+  <div class="controls">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="text" placeholder="Search workouts…">
+    </div>
+    <div class="segbtns" id="filter">
+      <button data-f="all" class="on">All</button>
+      <button data-f="int">Intervals</button>
+      <button data-f="long">Long Runs</button>
+    </div>
+    <select class="sort" id="sort">
+      <option value="dur-desc">Longest first</option>
+      <option value="dur-asc">Shortest first</option>
+      <option value="int-desc">Hardest first</option>
+      <option value="int-asc">Easiest first</option>
+      <option value="date-desc">Newest first</option>
+    </select>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty">No workouts match your filters.</div>
+
+</div>
+
+<div class="foot">
+  <div class="foot-bar">
+    <span>Tap any card to open the workout — bell &amp; voice coaching, Spotify keeps playing.</span>
+    <span><span class="acc">45</span> sessions ready</span>
+  </div>
+</div>
+
+<script>
+const RUNS = [{"file": "workouts/260524 - 10m - 70%.html", "date": "2026-05-24", "duration_min": 10, "intensity": "70%", "intensity_pct": 70, "is_long_run": false, "title": "260524 \u2013 10m \u2013 70%", "meta": "15 intervals \u00b7 3 phases \u00b7 hard and fast", "done_sub": "10 minutes. Relentless.", "done_stats": "3 sprints \u00b7 3 phases \u00b7 70% effort", "n_intervals": 15, "total_sec": 600, "by_type_sec": {"hard": 300, "easy": 240, "allout": 60}, "work_sec": 360, "work_pct": 60}, {"file": "workouts/260524 - 15m - 55%.html", "date": "2026-05-24", "duration_min": 15, "intensity": "55%", "intensity_pct": 55, "is_long_run": false, "title": "260524 \u2013 15m \u2013 55%", "meta": "17 intervals \u00b7 3 phases \u00b7 solid effort", "done_sub": "15 minutes. Well run.", "done_stats": "2 sprints \u00b7 3 phases \u00b7 55% effort", "n_intervals": 17, "total_sec": 900, "by_type_sec": {"moderate": 135, "easy": 335, "hard": 390, "allout": 40}, "work_sec": 430, "work_pct": 48}, {"file": "workouts/260524 - 20m - 50%.html", "date": "2026-05-24", "duration_min": 20, "intensity": "50%", "intensity_pct": 50, "is_long_run": false, "title": "260524 \u2013 20m \u2013 50%", "meta": "21 intervals \u00b7 4 phases \u00b7 moderate difficulty", "done_sub": "20 minutes. Great work.", "done_stats": "2 sprints \u00b7 4 phases \u00b7 50% effort", "n_intervals": 21, "total_sec": 1200, "by_type_sec": {"moderate": 330, "easy": 395, "hard": 435, "allout": 40}, "work_sec": 475, "work_pct": 40}, {"file": "workouts/260524 - 20m - 65%.html", "date": "2026-05-24", "duration_min": 20, "intensity": "65%", "intensity_pct": 65, "is_long_run": false, "title": "260524 \u2013 20m \u2013 65%", "meta": "23 intervals \u00b7 4 phases \u00b7 challenging", "done_sub": "20 minutes. Seriously strong effort.", "done_stats": "3 sprints \u00b7 4 phases \u00b7 65% effort", "n_intervals": 23, "total_sec": 1200, "by_type_sec": {"moderate": 180, "hard": 525, "easy": 435, "allout": 60}, "work_sec": 585, "work_pct": 49}, {"file": "workouts/260524 - 20m - 75%.html", "date": "2026-05-24", "duration_min": 20, "intensity": "75%", "intensity_pct": 75, "is_long_run": false, "title": "260524 \u2013 20m \u2013 75%", "meta": "24 intervals \u00b7 4 phases \u00b7 no moderate \u2014 all Hard", "done_sub": "20 minutes. That was brutal. Well done.", "done_stats": "4 sprints \u00b7 4 phases \u00b7 75% effort", "n_intervals": 24, "total_sec": 1200, "by_type_sec": {"hard": 630, "easy": 450, "allout": 120}, "work_sec": 750, "work_pct": 62}, {"file": "workouts/260525 - 10m - 40%.html", "date": "2026-05-25", "duration_min": 10, "intensity": "40%", "intensity_pct": 40, "is_long_run": false, "title": "260525 \u2013 10m \u2013 40%", "meta": "11 intervals \u00b7 3 phases \u00b7 comfortable effort", "done_sub": "10:00 minutes. Outstanding.", "done_stats": "0 sprints \u00b7 3 phases \u00b7 40% effort", "n_intervals": 11, "total_sec": 600, "by_type_sec": {"moderate": 195, "easy": 225, "hard": 180}, "work_sec": 180, "work_pct": 30}, {"file": "workouts/260525 - 10m - 55%.html", "date": "2026-05-25", "duration_min": 10, "intensity": "55%", "intensity_pct": 55, "is_long_run": false, "title": "260525 \u2013 10m \u2013 55%", "meta": "13 intervals \u00b7 3 phases \u00b7 solid effort", "done_sub": "10:00 minutes. Outstanding.", "done_stats": "1 sprint \u00b7 3 phases \u00b7 55% effort", "n_intervals": 13, "total_sec": 600, "by_type_sec": {"moderate": 105, "easy": 220, "hard": 255, "allout": 20}, "work_sec": 275, "work_pct": 46}, {"file": "workouts/260525 - 10m - 85%.html", "date": "2026-05-25", "duration_min": 10, "intensity": "85%", "intensity_pct": 85, "is_long_run": false, "title": "260525 \u2013 10m \u2013 85%", "meta": "16 intervals \u00b7 3 phases \u00b7 very hard, sprint-heavy", "done_sub": "10:00 minutes. Outstanding.", "done_stats": "4 sprints \u00b7 3 phases \u00b7 85% effort", "n_intervals": 16, "total_sec": 600, "by_type_sec": {"hard": 300, "easy": 220, "allout": 80}, "work_sec": 380, "work_pct": 63}, {"file": "workouts/260525 - 10m - Long Run.html", "date": "2026-05-25", "duration_min": 10, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 10m \u2013 Long Run", "meta": "3 run segments \u00b7 3 walk breaks \u00b7 three run segments", "done_sub": "10:00 on the clock. Great work.", "done_stats": "3 run segments \u00b7 10:00 total", "n_intervals": 6, "total_sec": 600, "by_type_sec": {"hard": 510, "easy": 90}, "work_sec": 510, "work_pct": 85}, {"file": "workouts/260525 - 12m - 45%.html", "date": "2026-05-25", "duration_min": 12, "intensity": "45%", "intensity_pct": 45, "is_long_run": false, "title": "260525 \u2013 12m \u2013 45%", "meta": "12 intervals \u00b7 3 phases \u00b7 comfortable, no sprints", "done_sub": "12:00 minutes. Outstanding.", "done_stats": "0 sprints \u00b7 3 phases \u00b7 45% effort", "n_intervals": 12, "total_sec": 720, "by_type_sec": {"moderate": 225, "easy": 270, "hard": 225}, "work_sec": 225, "work_pct": 31}, {"file": "workouts/260525 - 12m - 65%.html", "date": "2026-05-25", "duration_min": 12, "intensity": "65%", "intensity_pct": 65, "is_long_run": false, "title": "260525 \u2013 12m \u2013 65%", "meta": "15 intervals \u00b7 3 phases \u00b7 challenging", "done_sub": "12:00 minutes. Outstanding.", "done_stats": "2 sprints \u00b7 3 phases \u00b7 65% effort", "n_intervals": 15, "total_sec": 720, "by_type_sec": {"moderate": 90, "easy": 310, "hard": 280, "allout": 40}, "work_sec": 320, "work_pct": 44}, {"file": "workouts/260525 - 12m - 80%.html", "date": "2026-05-25", "duration_min": 12, "intensity": "80%", "intensity_pct": 80, "is_long_run": false, "title": "260525 \u2013 12m \u2013 80%", "meta": "16 intervals \u00b7 4 phases \u00b7 very hard", "done_sub": "12:00 minutes. Outstanding.", "done_stats": "3 sprints \u00b7 4 phases \u00b7 80% effort", "n_intervals": 16, "total_sec": 720, "by_type_sec": {"hard": 390, "easy": 270, "allout": 60}, "work_sec": 450, "work_pct": 62}, {"file": "workouts/260525 - 12m - Long Run.html", "date": "2026-05-25", "duration_min": 12, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 12m \u2013 Long Run", "meta": "3 run segments \u00b7 2 walk breaks \u00b7 three run segments", "done_sub": "12:00 on the clock. Great work.", "done_stats": "3 run segments \u00b7 12:00 total", "n_intervals": 5, "total_sec": 720, "by_type_sec": {"hard": 660, "easy": 60}, "work_sec": 660, "work_pct": 92}, {"file": "workouts/260525 - 15m - 40%.html", "date": "2026-05-25", "duration_min": 15, "intensity": "40%", "intensity_pct": 40, "is_long_run": false, "title": "260525 \u2013 15m \u2013 40%", "meta": "15 intervals \u00b7 3 phases \u00b7 comfortable, no sprints", "done_sub": "15:00 minutes. Outstanding.", "done_stats": "0 sprints \u00b7 3 phases \u00b7 40% effort", "n_intervals": 15, "total_sec": 900, "by_type_sec": {"moderate": 360, "easy": 315, "hard": 225}, "work_sec": 225, "work_pct": 25}, {"file": "workouts/260525 - 15m - 70%.html", "date": "2026-05-25", "duration_min": 15, "intensity": "70%", "intensity_pct": 70, "is_long_run": false, "title": "260525 \u2013 15m \u2013 70%", "meta": "17 intervals \u00b7 3 phases \u00b7 hard and varied", "done_sub": "15:00 minutes. Outstanding.", "done_stats": "2 sprints \u00b7 3 phases \u00b7 70% effort", "n_intervals": 17, "total_sec": 900, "by_type_sec": {"hard": 390, "easy": 350, "moderate": 120, "allout": 40}, "work_sec": 430, "work_pct": 48}, {"file": "workouts/260525 - 15m - 85%.html", "date": "2026-05-25", "duration_min": 15, "intensity": "85%", "intensity_pct": 85, "is_long_run": false, "title": "260525 \u2013 15m \u2013 85%", "meta": "20 intervals \u00b7 4 phases \u00b7 very hard, 4 sprints", "done_sub": "15:00 minutes. Outstanding.", "done_stats": "4 sprints \u00b7 4 phases \u00b7 85% effort", "n_intervals": 20, "total_sec": 900, "by_type_sec": {"hard": 415, "easy": 405, "allout": 80}, "work_sec": 495, "work_pct": 55}, {"file": "workouts/260525 - 15m - Long Run.html", "date": "2026-05-25", "duration_min": 15, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 15m \u2013 Long Run", "meta": "4 run segments \u00b7 3 walk breaks \u00b7 four run segments", "done_sub": "15:00 on the clock. Great work.", "done_stats": "4 run segments \u00b7 15:00 total", "n_intervals": 7, "total_sec": 900, "by_type_sec": {"hard": 765, "easy": 135}, "work_sec": 765, "work_pct": 85}, {"file": "workouts/260525 - 17m - Long Run.html", "date": "2026-05-25", "duration_min": 17, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 17m \u2013 Long Run", "meta": "3 run segments \u00b7 2 walk breaks \u00b7 three run segments", "done_sub": "17:00 on the clock. Great work.", "done_stats": "3 run segments \u00b7 17:00 total", "n_intervals": 5, "total_sec": 1020, "by_type_sec": {"hard": 915, "easy": 105}, "work_sec": 915, "work_pct": 90}, {"file": "workouts/260525 - 18m - 50%.html", "date": "2026-05-25", "duration_min": 18, "intensity": "50%", "intensity_pct": 50, "is_long_run": false, "title": "260525 \u2013 18m \u2013 50%", "meta": "17 intervals \u00b7 4 phases \u00b7 moderate effort", "done_sub": "18:00 minutes. Outstanding.", "done_stats": "1 sprint \u00b7 4 phases \u00b7 50% effort", "n_intervals": 17, "total_sec": 1080, "by_type_sec": {"moderate": 315, "easy": 430, "hard": 315, "allout": 20}, "work_sec": 335, "work_pct": 31}, {"file": "workouts/260525 - 18m - 65%.html", "date": "2026-05-25", "duration_min": 18, "intensity": "65%", "intensity_pct": 65, "is_long_run": false, "title": "260525 \u2013 18m \u2013 65%", "meta": "21 intervals \u00b7 4 phases \u00b7 challenging", "done_sub": "18:00 minutes. Outstanding.", "done_stats": "3 sprints \u00b7 4 phases \u00b7 65% effort", "n_intervals": 21, "total_sec": 1080, "by_type_sec": {"hard": 480, "easy": 420, "moderate": 120, "allout": 60}, "work_sec": 540, "work_pct": 50}, {"file": "workouts/260525 - 18m - 75%.html", "date": "2026-05-25", "duration_min": 18, "intensity": "75%", "intensity_pct": 75, "is_long_run": false, "title": "260525 \u2013 18m \u2013 75%", "meta": "21 intervals \u00b7 4 phases \u00b7 hard", "done_sub": "18:00 minutes. Outstanding.", "done_stats": "4 sprints \u00b7 4 phases \u00b7 75% effort", "n_intervals": 21, "total_sec": 1080, "by_type_sec": {"hard": 600, "easy": 400, "allout": 80}, "work_sec": 680, "work_pct": 63}, {"file": "workouts/260525 - 20m - 40%.html", "date": "2026-05-25", "duration_min": 20, "intensity": "40%", "intensity_pct": 40, "is_long_run": false, "title": "260525 \u2013 20m \u2013 40%", "meta": "18 intervals \u00b7 4 phases \u00b7 comfortable, no sprints", "done_sub": "20:00 minutes. Outstanding.", "done_stats": "0 sprints \u00b7 4 phases \u00b7 40% effort", "n_intervals": 18, "total_sec": 1200, "by_type_sec": {"moderate": 360, "easy": 495, "hard": 345}, "work_sec": 345, "work_pct": 29}, {"file": "workouts/260525 - 20m - 55%.html", "date": "2026-05-25", "duration_min": 20, "intensity": "55%", "intensity_pct": 55, "is_long_run": false, "title": "260525 \u2013 20m \u2013 55%", "meta": "20 intervals \u00b7 4 phases \u00b7 solid moderate effort", "done_sub": "20:00 minutes. Outstanding.", "done_stats": "2 sprints \u00b7 4 phases \u00b7 55% effort", "n_intervals": 20, "total_sec": 1200, "by_type_sec": {"moderate": 270, "easy": 485, "hard": 405, "allout": 40}, "work_sec": 445, "work_pct": 37}, {"file": "workouts/260525 - 20m - 80%.html", "date": "2026-05-25", "duration_min": 20, "intensity": "80%", "intensity_pct": 80, "is_long_run": false, "title": "260525 \u2013 20m \u2013 80%", "meta": "25 intervals \u00b7 4 phases \u00b7 very hard, 4 sprints", "done_sub": "20:00 minutes. Outstanding.", "done_stats": "4 sprints \u00b7 4 phases \u00b7 80% effort", "n_intervals": 25, "total_sec": 1200, "by_type_sec": {"hard": 620, "easy": 500, "allout": 80}, "work_sec": 700, "work_pct": 58}, {"file": "workouts/260525 - 20m - 90%.html", "date": "2026-05-25", "duration_min": 20, "intensity": "90%", "intensity_pct": 90, "is_long_run": false, "title": "260525 \u2013 20m \u2013 90%", "meta": "26 intervals \u00b7 4 phases \u00b7 brutal \u2014 no Moderate at all", "done_sub": "20:00 minutes. Outstanding.", "done_stats": "5 sprints \u00b7 4 phases \u00b7 90% effort", "n_intervals": 26, "total_sec": 1200, "by_type_sec": {"hard": 640, "easy": 460, "allout": 100}, "work_sec": 740, "work_pct": 62}, {"file": "workouts/260525 - 20m - Long Run.html", "date": "2026-05-25", "duration_min": 20, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 20m \u2013 Long Run", "meta": "5 run segments \u00b7 4 walk breaks \u00b7 five run segments", "done_sub": "20:00 on the clock. Great work.", "done_stats": "5 run segments \u00b7 20:00 total", "n_intervals": 9, "total_sec": 1200, "by_type_sec": {"hard": 1020, "easy": 180}, "work_sec": 1020, "work_pct": 85}, {"file": "workouts/260525 - 22m - Long Run.html", "date": "2026-05-25", "duration_min": 22, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 22m \u2013 Long Run", "meta": "4 run segments \u00b7 3 walk breaks \u00b7 four run segments", "done_sub": "22:00 on the clock. Great work.", "done_stats": "4 run segments \u00b7 22:00 total", "n_intervals": 7, "total_sec": 1320, "by_type_sec": {"hard": 1125, "easy": 195}, "work_sec": 1125, "work_pct": 85}, {"file": "workouts/260525 - 25m - 45%.html", "date": "2026-05-25", "duration_min": 25, "intensity": "45%", "intensity_pct": 45, "is_long_run": false, "title": "260525 \u2013 25m \u2013 45%", "meta": "22 intervals \u00b7 5 phases \u00b7 comfortable endurance", "done_sub": "25:00 minutes. Outstanding.", "done_stats": "1 sprint \u00b7 5 phases \u00b7 45% effort", "n_intervals": 22, "total_sec": 1500, "by_type_sec": {"moderate": 580, "easy": 600, "hard": 300, "allout": 20}, "work_sec": 320, "work_pct": 21}, {"file": "workouts/260525 - 25m - 60%.html", "date": "2026-05-25", "duration_min": 25, "intensity": "60%", "intensity_pct": 60, "is_long_run": false, "title": "260525 \u2013 25m \u2013 60%", "meta": "25 intervals \u00b7 5 phases \u00b7 moderately hard endurance", "done_sub": "25:00 minutes. Outstanding.", "done_stats": "3 sprints \u00b7 5 phases \u00b7 60% effort", "n_intervals": 25, "total_sec": 1500, "by_type_sec": {"moderate": 285, "easy": 645, "hard": 510, "allout": 60}, "work_sec": 570, "work_pct": 38}, {"file": "workouts/260525 - 25m - 70%.html", "date": "2026-05-25", "duration_min": 25, "intensity": "70%", "intensity_pct": 70, "is_long_run": false, "title": "260525 \u2013 25m \u2013 70%", "meta": "29 intervals \u00b7 5 phases \u00b7 hard endurance", "done_sub": "25:00 minutes. Outstanding.", "done_stats": "3 sprints \u00b7 5 phases \u00b7 70% effort", "n_intervals": 29, "total_sec": 1500, "by_type_sec": {"hard": 690, "easy": 555, "allout": 60, "moderate": 195}, "work_sec": 750, "work_pct": 50}, {"file": "workouts/260525 - 25m - Long Run.html", "date": "2026-05-25", "duration_min": 25, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 25m \u2013 Long Run", "meta": "5 run segments \u00b7 4 walk breaks \u00b7 five run segments", "done_sub": "25:00 on the clock. Great work.", "done_stats": "5 run segments \u00b7 25:00 total", "n_intervals": 9, "total_sec": 1500, "by_type_sec": {"hard": 1245, "easy": 255}, "work_sec": 1245, "work_pct": 83}, {"file": "workouts/260525 - 27m - Long Run.html", "date": "2026-05-25", "duration_min": 27, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 27m \u2013 Long Run", "meta": "4 run segments \u00b7 3 walk breaks \u00b7 four run segments", "done_sub": "27:00 on the clock. Great work.", "done_stats": "4 run segments \u00b7 27:00 total", "n_intervals": 7, "total_sec": 1620, "by_type_sec": {"hard": 1380, "easy": 240}, "work_sec": 1380, "work_pct": 85}, {"file": "workouts/260525 - 30m - 50%.html", "date": "2026-05-25", "duration_min": 30, "intensity": "50%", "intensity_pct": 50, "is_long_run": false, "title": "260525 \u2013 30m \u2013 50%", "meta": "29 intervals \u00b7 6 phases \u00b7 moderate endurance \u2014 longest run", "done_sub": "30:00 minutes. Outstanding.", "done_stats": "2 sprints \u00b7 6 phases \u00b7 50% effort", "n_intervals": 29, "total_sec": 1800, "by_type_sec": {"moderate": 490, "easy": 685, "hard": 585, "allout": 40}, "work_sec": 625, "work_pct": 35}, {"file": "workouts/260525 - 30m - Long Run.html", "date": "2026-05-25", "duration_min": 30, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 30m \u2013 Long Run", "meta": "5 run segments \u00b7 4 walk breaks \u00b7 five run segments", "done_sub": "30:00 on the clock. Great work.", "done_stats": "5 run segments \u00b7 30:00 total", "n_intervals": 9, "total_sec": 1800, "by_type_sec": {"hard": 1500, "easy": 300}, "work_sec": 1500, "work_pct": 83}, {"file": "workouts/260525 - 32m - Long Run.html", "date": "2026-05-25", "duration_min": 32, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 32m \u2013 Long Run", "meta": "4 run segments \u00b7 3 walk breaks \u00b7 four run segments", "done_sub": "32:00 on the clock. Great work.", "done_stats": "4 run segments \u00b7 32:00 total", "n_intervals": 7, "total_sec": 1920, "by_type_sec": {"hard": 1620, "easy": 300}, "work_sec": 1620, "work_pct": 84}, {"file": "workouts/260525 - 35m - Long Run.html", "date": "2026-05-25", "duration_min": 35, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 35m \u2013 Long Run", "meta": "6 run segments \u00b7 5 walk breaks \u00b7 six run segments", "done_sub": "35:00 on the clock. Great work.", "done_stats": "6 run segments \u00b7 35:00 total", "n_intervals": 11, "total_sec": 2100, "by_type_sec": {"hard": 1680, "easy": 420}, "work_sec": 1680, "work_pct": 80}, {"file": "workouts/260525 - 38m - Long Run.html", "date": "2026-05-25", "duration_min": 38, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 38m \u2013 Long Run", "meta": "5 run segments \u00b7 4 walk breaks \u00b7 five run segments", "done_sub": "38:00 on the clock. Great work.", "done_stats": "5 run segments \u00b7 38:00 total", "n_intervals": 9, "total_sec": 2280, "by_type_sec": {"hard": 1890, "easy": 390}, "work_sec": 1890, "work_pct": 83}, {"file": "workouts/260525 - 40m - Long Run.html", "date": "2026-05-25", "duration_min": 40, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 40m \u2013 Long Run", "meta": "5 run segments \u00b7 5 walk breaks \u00b7 five run segments", "done_sub": "40:00 on the clock. Great work.", "done_stats": "5 run segments \u00b7 40:00 total", "n_intervals": 10, "total_sec": 2400, "by_type_sec": {"hard": 1950, "easy": 450}, "work_sec": 1950, "work_pct": 81}, {"file": "workouts/260525 - 43m - Long Run.html", "date": "2026-05-25", "duration_min": 43, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 43m \u2013 Long Run", "meta": "5 run segments \u00b7 4 walk breaks \u00b7 five run segments", "done_sub": "43:00 on the clock. Great work.", "done_stats": "5 run segments \u00b7 43:00 total", "n_intervals": 9, "total_sec": 2580, "by_type_sec": {"hard": 2190, "easy": 390}, "work_sec": 2190, "work_pct": 85}, {"file": "workouts/260525 - 45m - Long Run.html", "date": "2026-05-25", "duration_min": 45, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 45m \u2013 Long Run", "meta": "5 run segments \u00b7 4 walk breaks \u00b7 five run segments", "done_sub": "45:00 on the clock. Great work.", "done_stats": "5 run segments \u00b7 45:00 total", "n_intervals": 9, "total_sec": 2700, "by_type_sec": {"hard": 2310, "easy": 390}, "work_sec": 2310, "work_pct": 86}, {"file": "workouts/260525 - 47m - Long Run.html", "date": "2026-05-25", "duration_min": 47, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 47m \u2013 Long Run", "meta": "5 run segments \u00b7 4 walk breaks \u00b7 five run segments", "done_sub": "47:00 on the clock. Great work.", "done_stats": "5 run segments \u00b7 47:00 total", "n_intervals": 9, "total_sec": 2820, "by_type_sec": {"hard": 2430, "easy": 390}, "work_sec": 2430, "work_pct": 86}, {"file": "workouts/260525 - 50m - Long Run.html", "date": "2026-05-25", "duration_min": 50, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 50m \u2013 Long Run", "meta": "5 run segments \u00b7 4 walk breaks \u00b7 five run segments", "done_sub": "50:00 on the clock. Great work.", "done_stats": "5 run segments \u00b7 50:00 total", "n_intervals": 9, "total_sec": 3000, "by_type_sec": {"hard": 2610, "easy": 390}, "work_sec": 2610, "work_pct": 87}, {"file": "workouts/260525 - 52m - Long Run.html", "date": "2026-05-25", "duration_min": 52, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 52m \u2013 Long Run", "meta": "6 run segments \u00b7 5 walk breaks \u00b7 six run segments", "done_sub": "52:00 on the clock. Great work.", "done_stats": "6 run segments \u00b7 52:00 total", "n_intervals": 11, "total_sec": 3120, "by_type_sec": {"hard": 2640, "easy": 480}, "work_sec": 2640, "work_pct": 85}, {"file": "workouts/260525 - 55m - Long Run.html", "date": "2026-05-25", "duration_min": 55, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 55m \u2013 Long Run", "meta": "6 run segments \u00b7 5 walk breaks \u00b7 six run segments", "done_sub": "55:00 on the clock. Great work.", "done_stats": "6 run segments \u00b7 55:00 total", "n_intervals": 11, "total_sec": 3300, "by_type_sec": {"hard": 2820, "easy": 480}, "work_sec": 2820, "work_pct": 85}, {"file": "workouts/260525 - 60m - Long Run.html", "date": "2026-05-25", "duration_min": 60, "intensity": "Long Run", "intensity_pct": null, "is_long_run": true, "title": "260525 \u2013 60m \u2013 Long Run", "meta": "8 run segments \u00b7 8 walk breaks \u00b7 eight run segments", "done_sub": "60:00 on the clock. Great work.", "done_stats": "8 run segments \u00b7 60:00 total", "n_intervals": 16, "total_sec": 3600, "by_type_sec": {"hard": 3000, "easy": 600}, "work_sec": 3000, "work_pct": 83}];
+const STATS = {"n": 45, "total_time": "18h 30m", "total_min": 1110, "n_int": 25, "n_long": 20, "dur_min": 10, "dur_max": 60, "pct_min": 40, "pct_max": 90};
+
+// ---- overview tiles ----
+const tiles = [
+  {v: STATS.n, l:"Total Sessions", x: STATS.n_int+" intervals · "+STATS.n_long+" long runs"},
+  {v: STATS.total_time, l:"Programmed Time", x: STATS.total_min+" minutes of coaching"},
+  {v: STATS.dur_min+"–"+STATS.dur_max+"m", l:"Duration Range", x:"per session"},
+  {v: STATS.pct_min+"–"+STATS.pct_max+"%", l:"Intensity Range", x:"interval sessions"},
+];
+document.getElementById('stats').innerHTML = tiles.map(t=>
+  `<div class="stat"><div class="v">${t.v}</div><div class="l">${t.l}</div><div class="x">${t.x}</div></div>`).join('');
+
+const enc = s => encodeURIComponent(s).replace(/%2F/g,'/');
+const grid = document.getElementById('grid');
+const fmtDate = d => { if(!d) return ''; const dt=new Date(d+'T00:00'); return dt.toLocaleDateString('en-NZ',{day:'numeric',month:'short'}); };
+
+function bar(r){
+  const by = r.by_type_sec||{}; const tot = r.total_sec||1;
+  const easy=(by.easy||0)+(by.moderate||0), hard=by.hard||0, allout=by.allout||0;
+  const pct = x => (x/tot*100).toFixed(1)+'%';
+  return `<div class="ibar">
+    <i class="seg-easy" style="width:${pct(easy)}"></i>
+    <i class="seg-hard" style="width:${pct(hard)}"></i>
+    <i class="seg-allout" style="width:${pct(allout)}"></i></div>`;
+}
+
+function card(r){
+  const long = r.is_long_run;
+  const tag = long ? `<span class="tag lr">Long Run</span>`
+                   : `<span class="tag pct">${r.intensity}</span>`;
+  const easyLbl = long ? 'Walk' : 'Easy';
+  const hardLbl = long ? 'Run' : 'Hard';
+  const aoLbl = long ? '' : 'Sprint';
+  const legend = `<div class="legend">
+     <span><i class="seg-easy"></i>${easyLbl}</span>
+     <span><i class="seg-hard"></i>${hardLbl}</span>
+     ${aoLbl?`<span><i class="seg-allout"></i>${aoLbl}</span>`:''}</div>`;
+  const work = r.work_pct!=null ? r.work_pct+'% work' : '';
+  return `<a class="card ${long?'long':''}" href="${enc(r.file)}">
+    <div class="card-top">
+      <div class="dur">${r.duration_min}<span>min</span></div>
+      ${tag}
+    </div>
+    <div class="meta">${r.meta||''}</div>
+    ${bar(r)}
+    ${legend}
+    <div class="tagline">“${(r.done_sub||'').replace(/"/g,'')}”</div>
+    <div class="card-foot">
+      <span class="foot-stats">${r.n_intervals} intervals · ${work}</span>
+      <span class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="#011B50" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </span>
+    </div>
+  </a>`;
+}
+
+let curFilter='all', curQ='';
+function apply(){
+  let list = RUNS.slice();
+  if(curFilter==='int') list=list.filter(r=>!r.is_long_run);
+  if(curFilter==='long') list=list.filter(r=>r.is_long_run);
+  if(curQ){ const q=curQ.toLowerCase();
+    list=list.filter(r=>((r.title||'')+' '+(r.meta||'')+' '+(r.intensity||'')+' '+(r.done_sub||'')).toLowerCase().includes(q)); }
+  const s=document.getElementById('sort').value;
+  const cmp={
+    'dur-desc':(a,b)=>b.duration_min-a.duration_min,
+    'dur-asc':(a,b)=>a.duration_min-b.duration_min,
+    'int-desc':(a,b)=>(b.work_pct||0)-(a.work_pct||0),
+    'int-asc':(a,b)=>(a.work_pct||0)-(b.work_pct||0),
+    'date-desc':(a,b)=>(b.date||'').localeCompare(a.date||'')||b.duration_min-a.duration_min,
+  }[s];
+  list.sort(cmp);
+  grid.innerHTML=list.map(card).join('');
+  document.getElementById('empty').style.display=list.length?'none':'block';
+  document.getElementById('shown').textContent=list.length+' shown';
+}
+
+document.getElementById('filter').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  [...e.currentTarget.children].forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); curFilter=b.dataset.f; apply();
+});
+document.getElementById('q').addEventListener('input',e=>{curQ=e.target.value;apply();});
+document.getElementById('sort').addEventListener('change',apply);
+apply();
+</script>
+</body>
+</html>
